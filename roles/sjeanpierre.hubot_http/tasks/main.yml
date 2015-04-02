@@ -1,0 +1,55 @@
+---
+# tasks file for sjeanpierre.hubot_http
+- name: Create necessary directories
+  sudo: yes
+  file:
+    path: "/var/docker/hubot_http_service"
+    mode: 0755
+    state: directory
+
+- name: install the latest version of git from yum
+  yum: name=git state=latest
+  sudo: yes
+
+- name: pull down hubot_http_service respository from Github
+  sudo: yes
+  git: repo=https://github.com/Sjeanpierre/hubot_http_service.git dest=/var/docker/hubot_http_service depth=1
+
+- name: Copy credential files
+  sudo: yes
+  copy:
+    src: "{{ item }}"
+    dest: "/var/docker/hubot_http_service/config/{{ item }}"
+  with_items:
+    - "credentials.enc"
+    - "rightscale.yml.enc"
+
+- name: decrypt aws credentials
+  shell: sudo openssl enc -d -aes-256-cbc -in credentials.enc -out credentials -k {{ encryption_key }}
+  sudo: yes
+  args:
+      chdir: /var/docker/hubot_http_service/config
+
+- name: decrypt rightscale config
+  shell: openssl enc -d -aes-256-cbc -in rightscale.yml.enc -out rightscale.yml -k {{ encryption_key }}
+  sudo: yes
+  args:
+      chdir: /var/docker/hubot_http_service/config
+
+- name: clean up encrypted files
+  shell: rm -fr *.enc
+  sudo: yes
+  args:
+      chdir: /var/docker/hubot_http_service/config
+
+- name: Build hubot_http_service container
+  sudo: yes
+  shell: docker build -t hubot_http_service .
+  args:
+    chdir: /var/docker/hubot_http_service
+
+- name: run hubot_http_service container
+  sudo: yes
+  shell: docker run -d -e "RACK_ENV=production" -p 9292:9292 -t -i hubot_http_service:latest
+  args:
+    chdir: /var/docker/hubot_http_service

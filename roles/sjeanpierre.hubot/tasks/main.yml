@@ -1,0 +1,39 @@
+---
+# tasks file for sjeanpierre.hubot
+- name: Create necessary directories
+  sudo: yes
+  file:
+    path: "/var/docker/hubot"
+    mode: 0755
+    state: directory
+
+- name: install the latest version of git from yum
+  yum: name=git state=latest
+  sudo: yes
+
+- name: pull down hubot_scripts respository from Github
+  sudo: yes
+  git: repo=https://github.com/Sjeanpierre/hubot_scripts.git dest=/var/docker/hubot depth=1
+
+- name: Copy packages file
+  sudo: yes
+  copy:
+    src: "{{ item }}"
+    dest: "/var/docker/hubot/{{ item }}"
+  with_items:
+    - "package.json"
+
+- template: src=hubot.j2 dest=/var/docker/hubot/hubot  mode=0755
+  sudo: yes
+
+- name: Build hubot container
+  sudo: yes
+  shell: docker build -t hubot .
+  args:
+    chdir: /var/docker/hubot
+
+- name: run hubot container
+  sudo: yes
+  shell: docker run -d -t -i hubot:latest
+  args:
+    chdir: /var/docker/hubot

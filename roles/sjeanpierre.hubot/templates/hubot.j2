@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -e
+
+
+export RFC_ACCESS_KEY="{{ rfc_access_key }}"
+export RFC_SECRET_KEY='{{ rfc_secret_key }}'
+export RFC_BASIC_USER="{{ rfc_basic_user }}"
+export RFC_BASIC_PASS="{{ rfc_basic_pass }}"
+export RFC_URL="{{ rfc_url }}"
+export HUBOT_SLACK_TOKEN="{{ hubot_slack_token }}"
+export HUBOT_SLACK_INCOMING_WEBHOOK="{{ hubot_slack_incoming_webhook }}"
+
+npm install
+export PATH="node_modules/.bin:node_modules/hubot/node_modules/.bin:$PATH"
+
+exec node_modules/.bin/hubot --adapter slack "$@"

@@ -1,0 +1,24 @@
+---
+- name: install the epel-release yum repo
+  yum: name=epel-release state=latest
+  sudo: yes
+
+- name: create docker base directory
+  sudo: yes
+  file:
+   path: "/var/docker"
+   mode: 0755
+   recurse: yes
+   state: directory
+
+- name: install the latest version of docker from yum
+  yum: name=docker-io state=latest
+  sudo: yes
+
+- name: start docker service
+  service: name=docker state=started
+  sudo: yes
+
+- name: ensure docker is running automatically at boot time
+  action: command /sbin/chkconfig docker on
+  sudo: yes

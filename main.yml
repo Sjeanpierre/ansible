@@ -1,0 +1,8 @@
+---
+- hosts: home
+  vars_files:
+    - 'vars/keys.yml'
+  roles:
+  - sjeanpierre.docker
+  - sjeanpierre.hubot_http
+  - sjeanpierre.hubot
