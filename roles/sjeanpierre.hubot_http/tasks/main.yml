@@ -23,6 +23,7 @@
   with_items:
     - "credentials.enc"
     - "rightscale.yml.enc"
+    - "email_stats.yml.enc"
 
 - name: decrypt aws credentials
   shell: sudo openssl enc -d -aes-256-cbc -in credentials.enc -out credentials -k {{ encryption_key }}
@@ -32,6 +33,12 @@
 
 - name: decrypt rightscale config
   shell: openssl enc -d -aes-256-cbc -in rightscale.yml.enc -out rightscale.yml -k {{ encryption_key }}
+  sudo: yes
+  args:
+      chdir: /var/docker/hubot_http_service/config
+
+- name: decrypt email_stats config
+  shell: openssl enc -d -aes-256-cbc -in email_stats.yml.enc -out email_stats.yml -k {{ encryption_key }}
   sudo: yes
   args:
       chdir: /var/docker/hubot_http_service/config
