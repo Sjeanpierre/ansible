@@ -60,3 +60,15 @@
   shell: docker run -d -e "RACK_ENV=production" -p 9292:9292 -t -i hubot_http_service:latest
   args:
     chdir: /var/docker/hubot_http_service
+
+- name: create cron jobs on host for updating
+  sudo: yes
+  cron:
+    name: "{{ item }}"
+    minute: "15"
+    job: "curl -I localhost:9292/run/{{ item }}"
+  with_items:
+      - "inventory_job"
+      - "email_stats_job"
+  tags:
+    - cron
