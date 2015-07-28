@@ -34,6 +34,6 @@
 
 - name: run hubot container
   sudo: yes
-  shell: docker run -d -t -i hubot:latest
+  shell: docker run --restart=always -d -t -i hubot:latest
   args:
     chdir: /var/docker/hubot

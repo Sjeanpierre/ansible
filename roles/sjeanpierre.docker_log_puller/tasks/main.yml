@@ -1,0 +1,25 @@
+---
+- name: create log puller directory
+  sudo: yes
+  file:
+   path: "/opt/log_puller"
+   mode: 0755
+   recurse: yes
+   state: directory
+
+- name: Copy log puller files
+  sudo: yes
+  copy:
+    src: "{{ item }}"
+    mode: 0777
+    dest: "/opt/log_puller/{{ item }}"
+  with_items:
+    - "docker_log_puller"
+    - "config.json"
+
+- name: create cron job to run log puller
+  sudo: yes
+  cron:
+    name: "docker_log_puller"
+    minute: "5"
+    job: "cd /opt/log_puller && ./docker_log_puller >> /var/log/docker_log_puller.log"
